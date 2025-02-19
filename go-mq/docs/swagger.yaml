@@ -1,0 +1,486 @@
+basePath: /api
+definitions:
+  dto.TodoResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  dto.UserResponse:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      gender:
+        type: string
+      id:
+        type: string
+      phone:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  request.CreateTodoRequest:
+    properties:
+      status:
+        enum:
+        - pending
+        - in_progress
+        - completed
+        type: string
+      title:
+        maxLength: 100
+        minLength: 3
+        type: string
+    required:
+    - status
+    - title
+    type: object
+  request.CreateUserRequestData:
+    properties:
+      email:
+        type: string
+      full_name:
+        type: string
+      gender:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      phone:
+        type: string
+    required:
+    - email
+    - full_name
+    - gender
+    - password
+    - phone
+    type: object
+  request.UpdateUserRequestData:
+    properties:
+      email:
+        type: string
+      full_name:
+        type: string
+      gender:
+        type: string
+      phone:
+        type: string
+    type: object
+  response.ErrorData:
+    properties:
+      error:
+        type: string
+      message:
+        type: string
+    type: object
+  response.PaginationMeta:
+    properties:
+      page:
+        type: integer
+      perPage:
+        type: integer
+      totalItems:
+        type: integer
+      totalPages:
+        type: integer
+    type: object
+  response.PaginationResponse:
+    properties:
+      data: {}
+      meta:
+        $ref: '#/definitions/response.PaginationMeta'
+    type: object
+  response.Response:
+    properties:
+      data: {}
+      error:
+        type: string
+      message:
+        type: string
+    type: object
+  response.Success:
+    properties:
+      data: {}
+      message:
+        type: string
+    type: object
+  response.SuccessData:
+    properties:
+      data: {}
+      message:
+        type: string
+    type: object
+  response.ValidationError:
+    properties:
+      field:
+        type: string
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: your-email@domain.com
+    name: API Support
+  description: This is a sample swagger for Fiber Boilerplate
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Fiber Boilerplate API
+  version: "1.0"
+paths:
+  /todos:
+    get:
+      consumes:
+      - application/json
+      description: Get paginated list of todos with optional search
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: perPage
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Todos fetched successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.PaginationResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.TodoResponse'
+                  type: array
+              type: object
+      summary: Get list of todos
+      tags:
+      - todos
+    post:
+      consumes:
+      - application/json
+      description: Create new todo with the provided data
+      parameters:
+      - description: Todo data
+        in: body
+        name: todo
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateTodoRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Todo created successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessData'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.TodoResponse'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.ErrorData'
+        "422":
+          description: Validation error
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                errors:
+                  items:
+                    $ref: '#/definitions/response.ValidationError'
+                  type: array
+              type: object
+      summary: Create new todo
+      tags:
+      - todos
+  /todos/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete todo by ID
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Todo deleted successfully
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.ErrorData'
+      summary: Delete todo
+      tags:
+      - todos
+    get:
+      consumes:
+      - application/json
+      description: Get todo details by todo ID
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Todo fetched successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessData'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.TodoResponse'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.ErrorData'
+      summary: Get todo by ID
+      tags:
+      - todos
+    put:
+      consumes:
+      - application/json
+      description: Update todo details by ID
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Todo data
+        in: body
+        name: todo
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateTodoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Todo updated successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessData'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.TodoResponse'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.ErrorData'
+        "422":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/response.ValidationError'
+      summary: Update todo
+      tags:
+      - todos
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Get paginated list of users with optional search
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: perPage
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Users fetched successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.PaginationResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.UserResponse'
+                  type: array
+              type: object
+      summary: Get list of users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Create new user with the provided data
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateUserRequestData'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User created successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessData'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.UserResponse'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.ErrorData'
+        "422":
+          description: Validation error
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                errors:
+                  items:
+                    $ref: '#/definitions/response.ValidationError'
+                  type: array
+              type: object
+      summary: Create new user
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User deleted successfully
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.ErrorData'
+      summary: Delete user
+      tags:
+      - users
+    get:
+      consumes:
+      - application/json
+      description: Get user details by user ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User fetched successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessData'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.UserResponse'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.ErrorData'
+      summary: Get user by ID
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Update user details by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateUserRequestData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User updated successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessData'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.UserResponse'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.ErrorData'
+        "422":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/response.ValidationError'
+      summary: Update user
+      tags:
+      - users
+swagger: "2.0"

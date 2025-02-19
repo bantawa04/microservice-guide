@@ -16,7 +16,8 @@ type AuthRouter struct {
 func NewAuthRouter(app *fiber.App) *AuthRouter {
 	userRepo := repository.NewUserRepository()
 	userService := service.NewUserService(userRepo)
-	authController := controller.NewAuthController(userService)
+	authService := service.NewAuthService(userRepo)
+	authController := controller.NewAuthController(userService, authService)
 
 	return &AuthRouter{
 		app:            app,
@@ -28,4 +29,6 @@ func (r *AuthRouter) Setup(api fiber.Router) {
 	auth := api.Group("/auth")
 
 	auth.Post("/register", middleware.DBTransactionHandler(), r.authController.RegisterUser)
+	auth.Post("/login", r.authController.Login)
+
 }

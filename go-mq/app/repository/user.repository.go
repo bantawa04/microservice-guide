@@ -14,6 +14,7 @@ type UserRepository interface {
 	GetUserByPhone(phone string) bool
 	UpdateUser(user *model.UserModel) (*model.UserModel, error)
 	DeleteUser(id string) error
+	GetUserByEmailForAuth(email string) (*model.UserModel, error)
 	WithTrx(tx *gorm.DB) UserRepository
 }
 
@@ -107,4 +108,16 @@ func (r *userRepository) GetUserByPhone(phone string) bool {
 // Update implementation
 func (r *userRepository) DeleteUser(id string) error {
 	return r.db.Delete(&model.UserModel{}, "id = ?", id).Error
+}
+
+func (r *userRepository) GetUserByEmailForAuth(email string) (*model.UserModel, error) {
+	var user model.UserModel
+	err := r.db.Where("email = ?", email).First(&user).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &user, nil
 }

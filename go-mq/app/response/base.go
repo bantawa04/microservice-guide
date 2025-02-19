@@ -40,6 +40,13 @@ type ErrorData struct {
 	Error   string `json:"error"`
 }
 
+type TokenResponse struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	TokenType    string `json:"token_type"`
+	ExpiresIn    int64  `json:"expires_in"`
+}
+
 // Update the response functions to return a cleaner structure
 
 func ErrorResponse(c *fiber.Ctx, status int, err error, message string) error {

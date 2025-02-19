@@ -12,11 +12,12 @@ type Env struct {
 	APP_DEBUG bool   `mapstructure:"APP_DEBUG"`
 	APP_ENV   string `mapstructure:"APP_ENV"`
 
-	SERVER_PORT string `mapstructure:"SERVER_PORT"`
-	DBUrl       string `mapstructure:"DATABASE_URL"`
-	TimeZone    string `mapstructure:"TZ"`
+	SERVER_PORT  string `mapstructure:"SERVER_PORT"`
+	DBUrl        string `mapstructure:"DATABASE_URL"`
+	TimeZone     string `mapstructure:"TZ"`
 	LogStack     string `mapstructure:"LOG_STACK"`
 	LogRetention int    `mapstructure:"LOG_RETENTION"`
+	JWT_SECERET  string `mapstructure:"JWT_SECRET"`
 }
 
 // NewEnv creates a new environment
@@ -41,6 +42,10 @@ func NewEnv() Env {
 
 	if env.TimeZone == "" {
 		env.TimeZone = "UTC"
+	}
+
+	if env.JWT_SECERET == "" {
+		env.JWT_SECERET = "JWT SECRET"
 	}
 
 	return env

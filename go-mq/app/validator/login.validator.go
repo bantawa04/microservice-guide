@@ -8,11 +8,11 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type RegisterValidator struct {
+type LoginValidator struct {
 	*validator.Validate
 }
 
-func NewRegisterationValidator() RegisterValidator {
+func NewLoginValidator() LoginValidator {
 	v := validator.New()
 
 	_ = v.RegisterValidation("email", func(fl validator.FieldLevel) bool {
@@ -22,12 +22,12 @@ func NewRegisterationValidator() RegisterValidator {
 		}
 		return true
 	})
-	return RegisterValidator{
+	return LoginValidator{
 		Validate: v,
 	}
 }
 
-func (cv RegisterValidator) generateValidationMessage(field string, rule string) (message string) {
+func (cv LoginValidator) generateValidationMessage(field string, rule string) (message string) {
 	switch rule {
 	case "required":
 		return fmt.Sprintf("Field '%s' is '%s'.", field, rule)
@@ -38,7 +38,7 @@ func (cv RegisterValidator) generateValidationMessage(field string, rule string)
 	}
 }
 
-func (cv RegisterValidator) GenerateValidationResponse(err error) []response.ValidationError {
+func (cv LoginValidator) GenerateValidationResponse(err error) []response.ValidationError {
 	var validations []response.ValidationError
 	for _, value := range err.(validator.ValidationErrors) {
 		field, rule := value.Field(), value.Tag()

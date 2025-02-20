@@ -3,6 +3,8 @@ package errors
 import (
 	"errors"
 	"fmt"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 // Custom error types
@@ -19,7 +21,7 @@ func (e *AppError) Error() string {
 // Error constructors
 func NewNotFoundError(message string) *AppError {
 	return &AppError{
-		Code:    404,
+		Code:    fiber.StatusNotFound,
 		Message: message,
 		Err:     errors.New("not found"),
 	}
@@ -27,7 +29,7 @@ func NewNotFoundError(message string) *AppError {
 
 func NewBadRequestError(message string) *AppError {
 	return &AppError{
-		Code:    400,
+		Code:    fiber.StatusBadRequest,
 		Message: message,
 		Err:     errors.New("bad request"),
 	}
@@ -35,7 +37,7 @@ func NewBadRequestError(message string) *AppError {
 
 func NewConflictError(message string) *AppError {
 	return &AppError{
-		Code:    409,
+		Code:    fiber.StatusConflict,
 		Message: message,
 		Err:     errors.New("conflict"),
 	}
@@ -43,16 +45,24 @@ func NewConflictError(message string) *AppError {
 
 func NewInternalError(err error) *AppError {
 	return &AppError{
-		Code:    500,
+		Code:    fiber.StatusInternalServerError,
 		Message: "Internal server error",
-		Err:     err,
+		Err:     errors.New("internal server error"),
 	}
 }
 
 func NewUnauthorizedError(message string) *AppError {
 	return &AppError{
-		Code:    404,
+		Code:    fiber.StatusNotFound,
 		Message: message,
-		Err:     errors.New("not found"),
+		Err:     errors.New("unauthorized"),
+	}
+}
+
+func JWTError(message string, err error, code int) *AppError {
+	return &AppError{
+		Code:    code,
+		Message: message,
+		Err:     err,
 	}
 }

@@ -27,24 +27,28 @@ func NewBookController(bookService service.BookService) BookController {
 }
 
 func (ctrl *bookController) CreateBook(c *fiber.Ctx) error {
-	tx := c.Locals(middleware.DBTransaction).(*gorm.DB)
+    tx := c.Locals(middleware.DBTransaction).(*gorm.DB)
 
-	reqData := new(request.CreateBookRequestData)
-	if err := c.BodyParser(reqData); err != nil {
-		return err
-	}
+    // Extract user ID from context
+    userContext := c.Locals(middleware.UserContextKey).(map[string]interface{})
+    userID := userContext["user_id"].(string)
 
-	if errors := ctrl.validator.Validate.Struct(reqData); errors != nil {
-		return response.ValidationErrorResponse(c,
-			ctrl.validator.GenerateValidationResponse(errors))
-	}
+    reqData := new(request.CreateBookRequestData)
+    if err := c.BodyParser(reqData); err != nil {
+        return err
+    }
 
-	bookModel := reqData.ToModel()
+    if errors := ctrl.validator.Validate.Struct(reqData); errors != nil {
+        return response.ValidationErrorResponse(c,
+            ctrl.validator.GenerateValidationResponse(errors))
+    }
 
-	err := ctrl.bookService.WithTrx(tx).CreateBook(bookModel)
-	if err != nil {
-		return err
-	}
+    bookModel := reqData.ToModel(userID)
 
-	return response.SuccessResponse(c, fiber.StatusCreated, "Product Created Successfully")
+    err := ctrl.bookService.WithTrx(tx).CreateBook(bookModel)
+    if err != nil {
+        return err
+    }
+
+    return response.SuccessResponse(c, fiber.StatusCreated, "Book Created Successfully")
 }

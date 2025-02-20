@@ -26,5 +26,5 @@ func NewBookRouter(app *fiber.App) *BookRouter {
 
 func (r *BookRouter) Setup(api fiber.Router) {
 	books := api.Group("/books")
-	books.Post("", middleware.DBTransactionHandler(), r.bookController.CreateBook)
+	books.Post("", middleware.Protected(), middleware.DBTransactionHandler(), r.bookController.CreateBook)
 }

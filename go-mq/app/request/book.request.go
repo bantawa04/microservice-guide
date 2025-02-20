@@ -12,12 +12,13 @@ type CreateBookRequestData struct {
 }
 
 // ToModel converts the request data to a UserModel
-func (r *CreateBookRequestData) ToModel() *model.BookModel {
-	return &model.BookModel{
-		Book: dao.Book{
-			Name:        r.Name,
-			Description: &r.Description,
-			Price:       r.Price,
-		},
-	}
+func (r *CreateBookRequestData) ToModel(userID string) *model.BookModel {
+    return &model.BookModel{
+        Book: dao.Book{
+            Name:        r.Name,
+            Description: &r.Description,
+            Price:       r.Price,
+            UserID:      userID,
+        },
+    }
 }
